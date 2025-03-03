@@ -4,9 +4,9 @@ More features will be coming
 
 Components
 - 1x Raspberry pi pico
-	- 1x LCD screen
-	- 1x Passive buzzer
-	- 1x Ultrasonic sensor
+- 1x LCD screen
+- 1x Passive buzzer
+- 1x Ultrasonic sensor
 
 
 Finished features 👏
