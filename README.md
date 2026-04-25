@@ -1,4 +1,4 @@
-## Python timer project
+## Python pomodoro timer project
 
 More features will be coming
 
