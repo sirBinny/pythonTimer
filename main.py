@@ -13,9 +13,9 @@ oled = SSD1306_I2C(oled_width, oled_height, i2c)
 oled.fill(0)
 
 # Configure pins for rotary encoder
-clk = Pin(10, Pin.IN, Pin.PULL_UP)
-dt = Pin(11, Pin.IN, Pin.PULL_UP)
-sw = Pin(12, Pin.IN, Pin.PULL_UP)
+clk = Pin(20, Pin.IN, Pin.PULL_UP)
+dt = Pin(19, Pin.IN, Pin.PULL_UP)
+sw = Pin(18, Pin.IN, Pin.PULL_UP)
 
 # Variables to track rotation(dt,clk,sw)
 rotary = Rotary(dt,clk,sw)
@@ -27,6 +27,7 @@ onPage = False
 startTimer = False
 TimerHolder = None
 currentObjectSelected = 0
+startedTimerSelected = 0
 
 timeHour = 0
 timeSecs = 0
@@ -47,8 +48,9 @@ def welcome():
     time.sleep(2)
     oled.contrast(1)
 
-def highlight(obj):
+def highlight(obj,yoffset):
     oled.rect(centerMsg(obj)-4,yoffset-2,len(obj)*8+8,12,1) #(x,y,sizex,sizey, color)
+
 
 #standard yoffset is 4
 def SetMessage(msg, yoffset):
@@ -106,7 +108,8 @@ def startTimerClock(timer):
             timeSecs = 59
     
     oled.fill(0)
-    
+    highLightOnTimerScreen()
+
     oled.text("timer",centerMsg("timer"),4)
     
     oled.text("pause",centerMsg("pause"),30)
@@ -131,15 +134,42 @@ def checkScreen():
     SetMessage(pages[currentPage-1],4)
     
     
+def highLightOnTimerScreen():
+    global startedTimerSelected
+    if startedTimerSelected%2 == 0:
+        highlight("pause",30)
+    else:
+        highlight("cancel",40)
+
 
 def rotary_changed(change):
-    global onPage, currentPage, startTimer, TimerHolder
-    
+    global onPage, currentPage, startTimer, TimerHolder, startedTimerSelected
     if startTimer :
         print("currently in timer")
-        return
-      
-    
+        #we want to highlight the options and allow user to select them
+        if change == Rotary.ROT_CW:
+            startedTimerSelected += 1
+            return
+                
+        elif change == Rotary.ROT_CCW:
+            startedTimerSelected -= 1
+            return
+        
+        elif change == Rotary.SW_PRESS:
+            if startedTimerSelected%2 == 0: #pause
+                print("ON PAUSE")
+                #TimerHolder.deinit()
+                #startTimer = False
+            else: #cancel
+                TimerHolder.deinit()
+                timeHour = 0
+                timeMins = 0
+                timeSecs = 0
+                startTimer = False
+            return
+        
+
+
     
     if change == Rotary.ROT_CW:
         if onPage: # when user is adjusting values within a page
